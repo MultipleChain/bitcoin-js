@@ -1,0 +1,45 @@
+{
+  "namespace": "multiplechain",
+  "name": "@multiplechain/bitcoin",
+  "version": "0.1.0",
+  "description": "Bitcoin JS provider",
+  "scripts": {
+    "serve": "parcel test.html --no-cache --dist-dir test",
+    "build": "webpack"
+  },
+  "files": [
+    "src"
+  ],
+  "main": "src/provider.js",
+  "types": "index.d.ts",
+  "typings": "index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MultipleChain/bitcoin.git"
+  },
+  "keywords": [
+    "Blockchain",
+    "Bitcoin",
+    "Cryptocurrency"
+  ],
+  "author": "MultipleChain",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/MultipleChain/bitcoin/issues"
+  },
+  "homepage": "https://github.com/MultipleChain/bitcoin",
+  "dependencies": {
+    "@multiplechain/utils": "^0.1.1",
+    "bignumber.js": "^9.1.1",
+    "web3-utils": "^1.8.1"
+  },
+  "devDependencies": {
+    "assert": "^2.0.0",
+    "buffer": "^5.7.1",
+    "events": "^3.3.0",
+    "process": "^0.11.10",
+    "stream-browserify": "^3.0.0",
+    "webpack": "^5.76.0",
+    "webpack-cli": "^5.0.1"
+  }
+}

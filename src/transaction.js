@@ -166,11 +166,10 @@ class Transaction {
     }
 
     /**
-     * @param {String} receiver 
-     * @param {Number} amount 
+     * @param {Object} config
      * @returns {Boolean}
      */
-    async verifyTransferWithData(receiver, amount) {
+    async verifyTransferWithData(config) {
 
         if (await this.validateTransaction()) {
 
@@ -178,7 +177,7 @@ class Transaction {
             if (this.provider.testnet) {
 
                 let index = this.data.vout.findIndex(object => {
-                    return object.scriptpubkey_address == receiver;
+                    return object.scriptpubkey_address == config.receiver;
                 });
 
                 data = this.data.vout[index];
@@ -190,7 +189,7 @@ class Transaction {
             } else {
                 
                 let index = this.data.out.findIndex(object => {
-                    return object.addr == receiver;
+                    return object.addr == config.receiver;
                 });
 
                 data = this.data.out[index];
@@ -201,7 +200,7 @@ class Transaction {
                 };
             }
 
-            if (data.receiver == receiver && data.amount == amount) {
+            if (data.receiver == config.receiver && data.amount == config.amount) {
                 return true;
             } else {
                 return false;

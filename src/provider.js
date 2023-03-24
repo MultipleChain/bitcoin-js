@@ -36,6 +36,13 @@ class Provider {
 
         let data = await fetch(apiUrl).then(res => res.json());
 
+        if (data.length == 0) {
+            return {
+                hash: null,
+                amount: 0
+            }
+        }
+
         if (data.txs) {
 
             let tx = data.txs[0];

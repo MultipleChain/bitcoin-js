@@ -6,7 +6,7 @@ module.exports = {
     entry: './src/provider.js',
     output: {
         path: path.join(__dirname, "/dist"),
-        filename: 'provider.js',
+        filename: 'bitcoin-provider.js',
         library: 'Bitcoin',
         libraryTarget: 'umd',
         globalObject: 'this',

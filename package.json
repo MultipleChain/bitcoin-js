@@ -10,7 +10,7 @@
   "files": [
     "src"
   ],
-  "main": "src/provider.js",
+  "main": "src/bitcoin-provider.js",
   "types": "index.d.ts",
   "typings": "index.d.ts",
   "repository": {

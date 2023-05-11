@@ -49,15 +49,7 @@ class Transaction {
      */
     async getData() {
         try {
-
-            let txApi;
-
-            if (this.provider.testnet) {
-                txApi = this.provider.api + 'tx/' + this.hash;
-            } else {
-                txApi = this.provider.api + 'rawtx/' + this.hash;
-            }
-            
+            let txApi = this.provider.api + 'tx/' + this.hash;
             this.data = await fetch(txApi).then(res => res.json());
         } catch (error) {
             throw new Error('There was a problem retrieving transaction data!');
@@ -72,13 +64,7 @@ class Transaction {
     async getConfirmations() {
         try {
 
-            let blockApi;
-            if (this.provider.testnet) {
-                blockApi = this.provider.api + 'blocks/tip/height';
-            } else {
-                blockApi = this.provider.api + 'latestblock';
-            }
-
+            let blockApi = this.provider.api + 'blocks/tip/height';
             if (!this.data) await this.getData();
             let latestBlock = await fetch(blockApi).then(res => res.json());
 
@@ -86,14 +72,7 @@ class Transaction {
                 latestBlock = latestBlock.height;
             }
 
-            let blockHeight;
-            if (this.provider.testnet) {
-                blockHeight = this.data.status.block_height;
-            } else {
-                blockHeight = this.data.block_height;
-            }
-
-            return ((latestBlock - blockHeight) + 1);
+            return ((latestBlock - this.data.status.block_height) + 1);
         } catch (error) {}
     }
 
@@ -133,14 +112,8 @@ class Transaction {
                     if (this.data == null) {
                         result = false;
                     } else {
-                        if (this.provider.testnet) {
-                            if (this.data.status.block_height) {
-                                result = true;
-                            }
-                        } else {
-                            if (this.data.block_height) {
-                                result = true;
-                            }
+                        if (this.data.status.block_height) {
+                            result = true;
                         }
                     }
 
@@ -173,31 +146,15 @@ class Transaction {
 
         if (await this.validateTransaction()) {
 
-            let data;
-            if (this.provider.testnet) {
+            let index = this.data.vout.findIndex(object => {
+                return object.scriptpubkey_address == config.receiver;
+            });
 
-                let index = this.data.vout.findIndex(object => {
-                    return object.scriptpubkey_address == config.receiver;
-                });
-
-                data = this.data.vout[index];
-                
-                data = {
-                    receiver: data.scriptpubkey_address,
-                    amount: utils.toDec(data.value, 8)
-                };
-            } else {
-                
-                let index = this.data.out.findIndex(object => {
-                    return object.addr == config.receiver;
-                });
-
-                data = this.data.out[index];
-
-                data = {
-                    receiver: data.addr,
-                    amount: utils.toDec(data.value, 8)
-                };
+            let data = this.data.vout[index];
+            
+            data = {
+                receiver: data.scriptpubkey_address,
+                amount: utils.toDec(data.value, 8)
             }
 
             if (data.receiver == config.receiver && data.amount == config.amount) {
@@ -214,11 +171,7 @@ class Transaction {
      * @returns {String}
      */
     getUrl() {
-        if (this.provider.testnet) {
-            return this.provider.explorer + 'tx/' + this.hash;
-        } else {
-            return this.provider.explorer + 'transactions/btc/' + this.hash;
-        }
+        return this.provider.explorer + 'tx/' + this.hash;
     }
 }
 

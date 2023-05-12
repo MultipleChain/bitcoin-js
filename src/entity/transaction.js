@@ -20,7 +20,7 @@ class Transaction {
     /**
      * @var {Number}
      */
-    timer;
+    timer = 30;
 
     /**
      * @param {String} hash 
@@ -72,7 +72,7 @@ class Transaction {
                 latestBlock = latestBlock.height;
             }
 
-            return ((latestBlock - this.data.status.block_height) + 1);
+            return ((latestBlock - (this.data.status.block_height || 0)) + 1);
         } catch (error) {}
     }
 

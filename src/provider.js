@@ -1,16 +1,43 @@
-const Transaction = require("./transaction");
 const utils = require("@multiplechain/utils");
+const Coin = require("./entity/coin");
+const Token = require("./entity/token");
+const Transaction = require("./entity/transaction");
 
 class Provider {
 
+    /**
+     * @var {String}
+     */
     api;
 
+    /**
+     * @var {String}
+     */
     explorer;
     
+    /**
+     * @var {Boolean}
+     */
     testnet;
+
+    /**
+     * @var {String}
+     */
+    network;
+
+    /**
+     * @var {Object}
+     */
+    detectedWallets = [];
+
+    /**
+     * @var {Object}
+     */
+    connectedWallet;
 
     constructor(testnet = false) {
         this.testnet = testnet;
+        this.network = testnet ? 'testnet' : 'livenet';
 
         if (!this.testnet) {
             this.api = "https://blockstream.info/api/";
@@ -19,6 +46,8 @@ class Provider {
             this.api = "https://blockstream.info/testnet/api/";
             this.explorer = "https://blockstream.info/testnet/";
         }
+
+        this.detectWallets();
     }
 
     getWalletOpenLink(address, amount) {
@@ -51,6 +80,10 @@ class Provider {
         return data;
     }
 
+    /**
+     * @param {String} receiver 
+     * @returns 
+     */
     async getAddressLastTransaction(receiver) {
         
         let apiUrl = this.api + 'address/' + receiver + '/txs';
@@ -83,6 +116,63 @@ class Provider {
             hash: tx.txid,
             amount: utils.toDec(data.value, 8)
         };
+    }
+
+    /**
+     * @param {Wallet} wallet 
+     */
+    setConnectedWallet(wallet) {
+        this.connectedWallet = wallet;
+    }
+
+    /**
+     * @param {String} adapter 
+     * @returns {Promise}
+     */
+    connectWallet(adapter) {
+        return new Promise(async (resolve, reject) => {
+            if (this.detectedWallets[adapter]) {
+                let wallet = this.detectedWallets[adapter];
+                wallet.connect()
+                .then(() => {
+                    resolve(wallet);
+                })
+                .catch(error => {
+                    
+                });
+            } else {
+                reject('wallet-not-found');
+            }
+        });
+    }
+
+    /**
+     * @param {Array} filter 
+     * @returns {Array}
+     */
+    getDetectedWallets(filter) {
+        if (!filter) return this.detectedWallets;
+        return Object.fromEntries(Object.entries(this.detectedWallets).filter(([key]) => {
+            return filter.includes(key);
+        }));
+    }
+
+    detectWallets() {
+        if (typeof window != 'undefined') {
+            const Wallet = require('./wallet');
+
+            if (typeof window.unisat !== 'undefined') {
+                this.detectedWallets['unisat'] = new Wallet('unisat', this);
+            }
+        }
+    }
+
+    Coin() {
+        return new Coin(this);
+    }
+
+    Token(address) {
+        return new Token(address, this);
     }
 
     Transaction(hash) {

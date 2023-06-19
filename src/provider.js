@@ -161,7 +161,7 @@ class Provider {
         if (typeof window != 'undefined') {
             const Wallet = require('./wallet');
 
-            if (typeof window.unisat !== 'undefined') {
+            if (typeof window.unisat !== 'undefined' && unisat.requestAccounts) {
                 this.detectedWallets['unisat'] = new Wallet('unisat', this);
             }
         }

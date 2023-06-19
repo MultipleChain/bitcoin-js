@@ -84,7 +84,7 @@ class Provider {
      * @param {String} receiver 
      * @returns 
      */
-    async getAddressLastTransaction(receiver) {
+    async getLastTransactionByReceiver(receiver) {
         
         let apiUrl = this.api + 'address/' + receiver + '/txs';
         let data = await fetch(apiUrl).then(response => response.text());

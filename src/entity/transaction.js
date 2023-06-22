@@ -58,6 +58,20 @@ class Transaction {
         return this.data;
     }
 
+    /**
+     * @param {Object} options
+     * @returns {Number}
+     */
+    async getTransferAmount(options) {
+        let data = await this.getData();
+        let receiver = options.receiver;
+        let index = data.vout.findIndex(object => {
+            return object.scriptpubkey_address == receiver;
+        });
+        data = data.vout[index];
+        return utils.toDec(data.value, 8);
+    }
+
     /** 
      * @returns {Number}
      */

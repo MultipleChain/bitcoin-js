@@ -1,7 +1,7 @@
 {
   "namespace": "multiplechain",
   "name": "@multiplechain/bitcoin",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Bitcoin JS provider",
   "scripts": {
     "serve": "parcel test.html --no-cache --dist-dir test",
@@ -31,6 +31,8 @@
   "dependencies": {
     "@multiplechain/utils": "^0.1.1",
     "bignumber.js": "^9.1.1",
+    "install": "^0.13.0",
+    "npm": "^9.7.2",
     "web3-utils": "^1.8.1"
   },
   "devDependencies": {

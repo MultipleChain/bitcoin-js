@@ -1,4 +1,3 @@
-const utils = require("@multiplechain/utils");
 const Coin = require("./entity/coin");
 const Token = require("./entity/token");
 const Transaction = require("./entity/transaction");
@@ -26,6 +25,16 @@ class Provider {
     network;
 
     /**
+     * @var {Boolean}
+     */
+    qrPayments = true;
+
+    /**
+     * @var {String}
+     */
+    wsUrl;
+    
+    /**
      * @var {Object}
      */
     detectedWallets = [];
@@ -42,9 +51,11 @@ class Provider {
         if (!this.testnet) {
             this.api = "https://blockstream.info/api/";
             this.explorer = "https://blockstream.info/";
+            this.wsUrl = "wss://mempool.space/api/v1/ws";
         } else {
             this.api = "https://blockstream.info/testnet/api/";
             this.explorer = "https://blockstream.info/testnet/";
+            this.wsUrl = "wss://mempool.space/testnet/api/v1/ws";
         }
 
         this.detectWallets();
@@ -80,42 +91,36 @@ class Provider {
         return data;
     }
 
-    /**
-     * @param {String} receiver 
-     * @returns 
-     */
-    async getLastTransactionByReceiver(receiver) {
-        
-        let apiUrl = this.api + 'address/' + receiver + '/txs';
-        let data = await fetch(apiUrl).then(response => response.text());
-        try {
-            data = JSON.parse(data);
-        } catch (error) {}
-        
-        data = this.errorCheck(data);
-        if (data.error) {
-            return data;
-        }
-
-        if (data.length == 0) {
-            return {
-                hash: null,
-                amount: 0
+    listenTransactions(options, callback) {
+        let receiver = options.receiver;
+        let ws = new WebSocket(this.wsUrl);
+        let subscription = {
+            unsubscribe: () => {
+                ws.close();
             }
         }
-            
-        let tx = data[0];
-
-        let index = tx.vout.findIndex(object => {
-            return object.scriptpubkey_address == receiver;
+    
+        ws.addEventListener('open', () => {
+            ws.send(JSON.stringify({ 'track-address': receiver }));
         });
 
-        data = tx.vout[index];
-
-        return {
-            hash: tx.txid,
-            amount: utils.toDec(data.value, 8)
-        };
+        let startCallback = async (data) => {
+            try {
+                let tx = this.Transaction(data['address-transactions'][0].txid);
+                await tx.getData();
+                callback(subscription, tx);
+            } catch (error) {
+                setTimeout(() => {
+                    startCallback(data);
+                }, 2500);
+            }
+        }
+    
+        ws.addEventListener('message', (res) => {
+            setTimeout(() => {
+                startCallback(JSON.parse(res.data));
+            }, 6000);
+        });
     }
 
     /**

@@ -44,9 +44,13 @@ class Provider {
      */
     connectedWallet;
 
-    constructor(testnet = false) {
-        this.testnet = testnet;
-        this.network = testnet ? 'testnet' : 'livenet';
+    /**
+     * @param {Object} options 
+     */
+    constructor(options) {
+        
+        this.testnet = options.testnet;
+        this.network = options.testnet ? 'testnet' : 'livenet';
 
         if (!this.testnet) {
             this.api = "https://blockstream.info/api/";

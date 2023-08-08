@@ -57,8 +57,8 @@ class Wallet {
     /**
      * @returns {String}
      */
-    getType() {
-        return this.adapter.type;
+    getSupports() {
+        return this.adapter.supports;
     }
 
     /**
@@ -76,20 +76,17 @@ class Wallet {
     }
 
     /**
+     * @returns {Boolean}
+     */
+    isDetected() {
+        return this.adapter.detected;
+    }
+
+    /**
      * @returns {String}
      */
     connect() {
         return new Promise((resolve, reject) => {
-            let time = 0;
-            let timeout = 15;
-            let timer = setInterval(async () => {
-                time += 1;
-                if (time > timeout) {
-                    clearInterval(timer);
-                    reject('timeout');
-                }
-            }, 1000);
-
             this.adapter.connect()
             .then(async (connectedAccount) => {
                 let network = await this.wallet.getNetwork();
@@ -102,9 +99,6 @@ class Wallet {
             })
             .catch((error) => {
                 utils.rejectMessage(error, reject);
-            })
-            .finally(() => {
-                clearInterval(timer);
             });
         });
     }

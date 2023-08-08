@@ -156,13 +156,29 @@ class Provider {
     }
 
     /**
-     * @param {Array} filter 
+     * @param {Array|null} filter 
+     * @returns {Array}
+     */
+    getSupportedWallets(filter) {
+        
+        const Wallet = require('./wallet');
+
+        const wallets = {
+            unisat: new Wallet('unisat', this)
+        };
+        
+        return Object.fromEntries(Object.entries(wallets).filter(([key]) => {
+            return !filter ? true : filter.includes(key);
+        }));
+    }
+
+    /**
+     * @param {Array|null} filter 
      * @returns {Array}
      */
     getDetectedWallets(filter) {
-        if (!filter) return this.detectedWallets;
         return Object.fromEntries(Object.entries(this.detectedWallets).filter(([key]) => {
-            return filter.includes(key);
+            return !filter ? true : filter.includes(key);
         }));
     }
 

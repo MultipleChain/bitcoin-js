@@ -27,9 +27,10 @@ module.exports = unisat = (provider) => {
     return {
         key: 'unisat',
         name: 'UniSat',
-        type: 'browser',
+        supports: ['browser'],
         wallet,
         connect,
-        download: 'https://unisat.io/download'
+        download: 'https://unisat.io/download',
+        detected: Boolean(typeof window.unisat !== 'undefined' && window.unisat.requestAccounts)
     }
 }

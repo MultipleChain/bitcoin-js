@@ -69,32 +69,6 @@ class Provider {
         return 'bitcoin' + ':' + String(address).toUpperCase() + '?amount=' + amount;
     }
 
-    errorCheck(data) {
-        if (typeof data == 'string') {
-            if (data == 'Address on invalid network') {
-                return {
-                    error: 'invalid-address'
-                }
-            } else {
-                return {
-                    error: 'any-error'
-                }
-            }
-        } else if (data.error) {
-            if (data.error == 'not-found-or-invalid-arg') {
-                return {
-                    error: 'invalid-address'
-                }
-            } else {
-                return {
-                    error: 'any-error'
-                }
-            }
-        }
-
-        return data;
-    }
-
     listenTransactions(options, callback) {
         let receiver = options.receiver;
         let ws = new WebSocket(this.wsUrl);

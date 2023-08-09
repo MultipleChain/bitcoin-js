@@ -1,14 +1,15 @@
 {
   "namespace": "multiplechain",
   "name": "@multiplechain/bitcoin",
-  "version": "0.1.6",
+  "version": "0.1.8",
   "description": "Bitcoin JS provider",
   "scripts": {
     "serve": "parcel test.html --no-cache --dist-dir test",
     "build": "webpack"
   },
   "files": [
-    "src"
+    "src",
+    "dist"
   ],
   "main": "src/bitcoin-provider.js",
   "types": "index.d.ts",
@@ -33,7 +34,8 @@
     "bignumber.js": "^9.1.1",
     "install": "^0.13.0",
     "npm": "^9.7.2",
-    "web3-utils": "^1.8.1"
+    "web3-utils": "^1.8.1",
+    "ws": "^8.13.0"
   },
   "devDependencies": {
     "assert": "^2.0.0",

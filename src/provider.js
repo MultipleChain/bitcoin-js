@@ -2,6 +2,10 @@ const Coin = require("./entity/coin");
 const Token = require("./entity/token");
 const Transaction = require("./entity/transaction");
 
+if (typeof window === 'undefined') {
+    WebSocket = require('ws');
+}
+
 class Provider {
 
     /**

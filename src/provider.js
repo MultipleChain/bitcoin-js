@@ -59,11 +59,11 @@ class Provider {
         if (this.testnet) {
             this.api = "https://blockstream.info/testnet/api/";
             this.explorer = "https://blockstream.info/testnet/";
-            this.wsUrl = "wss://mempool.space/testnet/api/v1/ws";
+            this.wsUrl = "wss://socket.blockcypher.com/v1/btc/test3?token=6d9cba333f234b9498473955497c40d9";
         } else {
             this.api = "https://blockstream.info/api/";
             this.explorer = "https://blockstream.info/";
-            this.wsUrl = "wss://mempool.space/api/v1/ws";
+            this.wsUrl = "wss://ws.blockchain.info/inv";
         }
 
         this.detectWallets();
@@ -76,33 +76,77 @@ class Provider {
     listenTransactions(options, callback) {
         let receiver = options.receiver;
         let ws = new WebSocket(this.wsUrl);
-        let subscription = {
-            unsubscribe: () => {
-                ws.close();
-            }
-        }
 
-        ws.addEventListener('open', () => {
-            ws.send(JSON.stringify({ 'track-address': receiver }));
-        });
-
-        let startCallback = async (data) => {
-            try {
-                let tx = this.Transaction(data['address-transactions'][0].txid);
-                await tx.getData();
-                callback(subscription, tx);
-            } catch (error) {
-                setTimeout(() => {
-                    startCallback(data);
-                }, 2500);
+        if (this.testnet) {
+            let subscription = {
+                unsubscribe: () => {
+                    ws.close();
+                }
             }
-        }
     
-        ws.addEventListener('message', (res) => {
-            setTimeout(() => {
-                startCallback(JSON.parse(res.data));
-            }, 6000);
-        });
+            ws.addEventListener('open', () => {
+                ws.send(JSON.stringify({
+                    event: "unconfirmed-tx",
+                    address: receiver,
+                    token: "6d9cba333f234b9498473955497c40d9"
+                }));
+            });
+    
+            let startCallback = async (data) => {
+                try {
+                    console.log(data);
+                    let tx = this.Transaction(data.hash);
+                    await tx.getData();
+                    callback(subscription, tx);
+                } catch (error) {
+                    setTimeout(() => {
+                        startCallback(data);
+                    }, 2500);
+                }
+            }
+        
+            ws.addEventListener('message', (res) => {
+                console.log(res);
+                setTimeout(() => {
+                    startCallback(JSON.parse(res.data));
+                }, 6000);
+            });
+        } else {
+            let subscription = {
+                unsubscribe: () => {
+                    ws.send(JSON.stringify({
+                        "op": "addr_unsub",
+                        "addr": receiver
+                    }));
+                    ws.close();
+                }
+            }
+            
+            ws.addEventListener('open', () => {
+                ws.send(JSON.stringify({
+                    "op": "addr_sub",
+                    "addr": receiver
+                }));
+            });
+
+            let startCallback = async (data) => {
+                try {
+                    let tx = this.Transaction(data.x.hash);
+                    await tx.getData();
+                    callback(subscription, tx);
+                } catch (error) {
+                    setTimeout(() => {
+                        startCallback(data);
+                    }, 2500);
+                }
+            }
+
+            ws.addEventListener('message', (res) => {
+                setTimeout(() => {
+                    startCallback(JSON.parse(res.data));
+                }, 6000);
+            });
+        }
     }
 
     /**

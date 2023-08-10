@@ -1,7 +1,7 @@
 {
   "namespace": "multiplechain",
   "name": "@multiplechain/bitcoin",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "Bitcoin JS provider",
   "scripts": {
     "serve": "parcel test.html --no-cache --dist-dir test",

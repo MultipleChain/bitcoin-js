@@ -94,7 +94,6 @@ class Provider {
     
             let startCallback = async (data) => {
                 try {
-                    console.log(data);
                     let tx = this.Transaction(data.hash);
                     await tx.getData();
                     callback(subscription, tx);
@@ -106,7 +105,6 @@ class Provider {
             }
         
             ws.addEventListener('message', (res) => {
-                console.log(res);
                 setTimeout(() => {
                     startCallback(JSON.parse(res.data));
                 }, 6000);

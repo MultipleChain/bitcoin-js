@@ -56,14 +56,14 @@ class Provider {
         this.testnet = options.testnet;
         this.network = options.testnet ? 'testnet' : 'livenet';
 
-        if (!this.testnet) {
-            this.api = "https://blockstream.info/api/";
-            this.explorer = "https://blockstream.info/";
-            this.wsUrl = "wss://mempool.space/api/v1/ws";
-        } else {
+        if (this.testnet) {
             this.api = "https://blockstream.info/testnet/api/";
             this.explorer = "https://blockstream.info/testnet/";
             this.wsUrl = "wss://mempool.space/testnet/api/v1/ws";
+        } else {
+            this.api = "https://blockstream.info/api/";
+            this.explorer = "https://blockstream.info/";
+            this.wsUrl = "wss://mempool.space/api/v1/ws";
         }
 
         this.detectWallets();
@@ -81,7 +81,7 @@ class Provider {
                 ws.close();
             }
         }
-    
+
         ws.addEventListener('open', () => {
             ws.send(JSON.stringify({ 'track-address': receiver }));
         });

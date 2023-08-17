@@ -51,7 +51,7 @@ class Provider {
     /**
      * @param {Object} options 
      */
-    constructor(options) {
+    constructor(options = {}) {
         
         this.testnet = options.testnet;
         this.network = options.testnet ? 'testnet' : 'livenet';
@@ -77,74 +77,58 @@ class Provider {
         let receiver = options.receiver;
         let ws = new WebSocket(this.wsUrl);
 
+        let message;
         if (this.testnet) {
-            let subscription = {
-                unsubscribe: () => {
-                    ws.close();
-                }
-            }
-    
-            ws.addEventListener('open', () => {
-                ws.send(JSON.stringify({
-                    event: "unconfirmed-tx",
-                    address: receiver,
-                    token: "6d9cba333f234b9498473955497c40d9"
-                }));
-            });
-    
-            let startCallback = async (data) => {
-                try {
-                    let tx = this.Transaction(data.hash);
-                    await tx.getData();
-                    callback(subscription, tx);
-                } catch (error) {
-                    setTimeout(() => {
-                        startCallback(data);
-                    }, 2500);
-                }
-            }
-        
-            ws.addEventListener('message', (res) => {
-                setTimeout(() => {
-                    startCallback(JSON.parse(res.data));
-                }, 6000);
+            message = JSON.stringify({
+                event: "unconfirmed-tx",
+                address: receiver,
+                token: "6d9cba333f234b9498473955497c40d9"
             });
         } else {
-            let subscription = {
-                unsubscribe: () => {
-                    ws.send(JSON.stringify({
-                        "op": "addr_unsub",
-                        "addr": receiver
-                    }));
-                    ws.close();
-                }
-            }
-            
-            ws.addEventListener('open', () => {
-                ws.send(JSON.stringify({
-                    "op": "addr_sub",
-                    "addr": receiver
-                }));
-            });
-
-            let startCallback = async (data) => {
-                try {
-                    let tx = this.Transaction(data.x.hash);
-                    await tx.getData();
-                    callback(subscription, tx);
-                } catch (error) {
-                    setTimeout(() => {
-                        startCallback(data);
-                    }, 2500);
-                }
-            }
-
-            ws.addEventListener('message', (res) => {
-                setTimeout(() => {
-                    startCallback(JSON.parse(res.data));
-                }, 6000);
+            message = JSON.stringify({
+                "op": "unconfirmed_sub"
             });
         }
+
+        let subscription = {
+            unsubscribe: () => {
+                if (!this.testnet) {
+                    ws.send(JSON.stringify({
+                        "op": "unconfirmed_unsub"
+                    }));
+                }
+                ws.close();
+            }
+        }
+
+        let startCallback = async (data) => {
+            try {
+                let tx = this.Transaction(data.hash || data.x.hash);
+                await tx.getData();
+                callback(subscription, tx);
+            } catch (error) {
+                setTimeout(() => {
+                    startCallback(data);
+                }, 2500);
+            }
+        }
+
+        ws.addEventListener('open', () => {
+            ws.send(message);
+        });
+
+        ws.addEventListener('message', (res) => {
+            let data = JSON.parse(res.data);
+            let outs = data.x.out;
+            let out = outs.find(o => {
+                return String(o.addr).toLowerCase() == receiver.toLowerCase();
+            });
+            if (out) {
+                setTimeout(() => {
+                    startCallback(data);
+                }, 6000);
+            }
+        });
     }
 
     /**

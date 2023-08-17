@@ -118,12 +118,16 @@ class Provider {
         });
 
         ws.addEventListener('message', (res) => {
+            let result = true;
             let data = JSON.parse(res.data);
-            let outs = data.x.out;
-            let out = outs.find(o => {
-                return String(o.addr).toLowerCase() == receiver.toLowerCase();
-            });
-            if (out) {
+            
+            if (!this.testnet) {
+                result = data.x.out.find(o => {
+                    return String(o.addr).toLowerCase() == receiver.toLowerCase();
+                });
+            }
+
+            if (result) {
                 setTimeout(() => {
                     startCallback(data);
                 }, 6000);

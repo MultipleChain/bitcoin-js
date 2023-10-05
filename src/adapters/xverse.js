@@ -6,7 +6,7 @@ module.exports = xverse = (provider) => {
                     BitcoinNetworkType.Testnet: 
                     BitcoinNetworkType.Mainnet;
 
-    const wallet = {
+    let wallet = {
         sendBitcoin: (to, amount) => {
             return new Promise(async (resolve, reject) => {
                 sendBtcTransaction({

@@ -2,6 +2,10 @@ module.exports = unisat = (provider) => {
     
     const wallet = window.unisat;
 
+    wallet.getAddress = async () => {
+        return (await wallet.getAccounts())[0];
+    }
+
     const connect = async () => {
         return new Promise(async (resolve, reject) => {
             try {
@@ -9,7 +13,7 @@ module.exports = unisat = (provider) => {
                 .then(async () => {
                     wallet.switchNetwork(provider.network)
                     .then(async () => {
-                        resolve((await wallet.getAccounts())[0]);
+                        resolve(wallet);
                     })
                     .catch(error => {
                         reject(error);
@@ -28,7 +32,6 @@ module.exports = unisat = (provider) => {
         key: 'unisat',
         name: 'UniSat',
         supports: ['browser'],
-        wallet,
         connect,
         download: 'https://unisat.io/download',
         detected: Boolean(typeof window.unisat !== 'undefined' && window.unisat.requestAccounts)

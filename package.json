@@ -34,6 +34,7 @@
     "bignumber.js": "^9.1.1",
     "install": "^0.13.0",
     "npm": "^9.7.2",
+    "sats-connect": "^1.1.1",
     "web3-utils": "^1.8.1",
     "ws": "^8.13.0"
   },

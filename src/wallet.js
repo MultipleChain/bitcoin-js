@@ -37,7 +37,6 @@ class Wallet {
      */
     setAdapter(adapter) {
         this.adapter = getAdapter(adapter, this.provider);
-        this.wallet = this.adapter.wallet;
     }
 
     /**
@@ -88,14 +87,11 @@ class Wallet {
     connect() {
         return new Promise((resolve, reject) => {
             this.adapter.connect()
-            .then(async (connectedAccount) => {
-                let network = await this.wallet.getNetwork();
-                if (this.provider.network == network) {
-                    this.provider.setConnectedWallet(this);
-                    resolve(this.connectedAccount = connectedAccount);
-                } else {
-                    reject('not-accepted-chain');
-                }
+            .then(async (wallet) => {
+                this.wallet = wallet;
+                this.connectedAccount = await wallet.getAddress();
+                this.provider.setConnectedWallet(this);
+                resolve(this.connectedAccount);
             })
             .catch((error) => {
                 utils.rejectMessage(error, reject);
@@ -128,8 +124,13 @@ class Wallet {
         return new Promise(async (resolve, reject) => {
             try {
                 let coin = this.provider.Coin();
-                
-                coin.transfer(this.connectedAccount, to, amount)
+                if (parseFloat(amount) > await coin.getBalance(this.connectedAccount)) {
+                    return reject('insufficient-balance');
+                }
+
+                amount = utils.toSatoshi(amount);
+
+                this.wallet.sendBitcoin(to, amount)
                 .then((transactionId) => {
                     resolve(this.provider.Transaction(transactionId));
                 })

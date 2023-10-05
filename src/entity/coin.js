@@ -43,39 +43,12 @@ class Coin {
     /**
      * @returns {Object}
      */
-    async getBalance() {
-        let balance = await this.provider.connectedWallet.wallet.getBalance();
-        return {
-            confirmed: utils.toDec(balance.confirmed, this.getDecimals()),
-            unconfirmed: utils.toDec(balance.unconfirmed, this.getDecimals()),
-            total: utils.toDec(balance.total, this.getDecimals())
-        }
+    async getBalance(address) {
+        let addressStatsApi = this.provider.api + 'address/' + address;
+        let addressStats = await fetch(addressStatsApi).then(res => res.json());
+        let balanceSat = addressStats.chain_stats.funded_txo_sum - addressStats.chain_stats.spent_txo_sum;
+        return utils.toBitcoin(balanceSat);
     }
-
-    /**
-     * @returns {Number}
-     */
-    async getConfirmedBalance() {
-        let balance = await this.getBalance();
-        return balance.confirmed;
-    }
-
-    /**
-     * @returns {Number}
-     */
-    async getUnconfirmedBalance() {
-        let balance = await this.getBalance();
-        return balance.unconfirmed;
-    }
-
-    /**
-     * @returns {Number}
-     */
-    async getTotalBalance() {
-        let balance = await this.getBalance();
-        return balance.total;
-    }
-
 
     /**
      * @param {String} from
@@ -86,18 +59,14 @@ class Coin {
     transfer(from, to, amount) {
         return new Promise(async (resolve, reject) => {
 
-            if (parseFloat(amount) > await this.getConfirmedBalance(from)) {
+            if (parseFloat(amount) > await this.getBalance(from)) {
                 return reject('insufficient-balance');
             }
 
             amount = utils.toSatoshi(amount);
-            this.provider.connectedWallet.wallet.sendBitcoin(to, amount)
-            .then((txid) => {
-                resolve(txid);
-            })
-            .catch((error) => {
-                reject(error);
-            });
+            
+            // develop for be side
+        
         });
     }
 }

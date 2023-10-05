@@ -155,7 +155,7 @@ class Provider {
                     resolve(wallet);
                 })
                 .catch(error => {
-                    
+                    reject(error);
                 });
             } else {
                 reject('wallet-not-found');
@@ -172,7 +172,9 @@ class Provider {
         const Wallet = require('./wallet');
 
         const wallets = {
-            unisat: new Wallet('unisat', this)
+            unisat: new Wallet('unisat', this),
+            xverse: new Wallet('xverse', this),
+            leather: new Wallet('leather', this),
         };
         
         return Object.fromEntries(Object.entries(wallets).filter(([key]) => {
@@ -196,6 +198,14 @@ class Provider {
 
             if (typeof window.unisat !== 'undefined' && unisat.requestAccounts) {
                 this.detectedWallets['unisat'] = new Wallet('unisat', this);
+            }
+
+            if (typeof window.XverseProviders !== 'undefined' && XverseProviders.BitcoinProvider) {
+                this.detectedWallets['xverse'] = new Wallet('xverse', this);
+            }
+
+            if (typeof window.btc !== 'undefined' && window.btc.request) {
+                this.detectedWallets['leather'] = new Wallet('leather', this);
             }
         }
     }

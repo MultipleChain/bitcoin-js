@@ -8,6 +8,9 @@ module.exports = Object.assign(utils, {
         let value = new BigNumber(amount.toString(10), 10).times(length);
         return parseInt(value.toString(10));
     },
+    toBitcoin(amount) {
+        return parseFloat(amount.toString(10) / 100000000);
+    },
     rejectMessage(error, reject) {
         
         if (typeof error == 'object') {

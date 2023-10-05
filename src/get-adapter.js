@@ -1,5 +1,7 @@
 const adapters = {
     unisat: require('./adapters/unisat'),
+    xverse: require('./adapters/xverse'),
+    leather: require('./adapters/leather'),
 }
 
 /**

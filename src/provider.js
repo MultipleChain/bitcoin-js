@@ -49,21 +49,32 @@ class Provider {
     connectedWallet;
 
     /**
+     * @var {String}
+     */
+    blockcypherToken;
+
+    /**
      * @param {Object} options 
      */
     constructor(options = {}) {
         
         this.testnet = options.testnet;
         this.network = options.testnet ? 'testnet' : 'mainnet';
+        this.blockcypherToken = options.blockcypherToken;
 
         if (this.testnet) {
             this.api = "https://blockstream.info/testnet/api/";
             this.explorer = "https://blockstream.info/testnet/";
-            this.wsUrl = "wss://socket.blockcypher.com/v1/btc/test3?token=6d9cba333f234b9498473955497c40d9";
+            let token = this.blockcypherToken || "6d9cba333f234b9498473955497c40d9";
+            this.wsUrl = "wss://socket.blockcypher.com/v1/btc/test3?token=" + token;
         } else {
             this.api = "https://blockstream.info/api/";
             this.explorer = "https://blockstream.info/";
-            this.wsUrl = "wss://ws.blockchain.info/inv";
+            if (this.blockcypherToken) {
+                this.wsUrl = "wss://socket.blockcypher.com/v1/btc/main?token=" + this.blockcypherToken;
+            } else {
+                this.wsUrl = "wss://ws.blockchain.info/inv";
+            }
         }
 
         this.detectWallets();
@@ -78,11 +89,11 @@ class Provider {
         let ws = new WebSocket(this.wsUrl);
 
         let message;
-        if (this.testnet) {
+        if (this.testnet || this.blockcypherToken) {
             message = JSON.stringify({
                 event: "unconfirmed-tx",
                 address: receiver,
-                token: "6d9cba333f234b9498473955497c40d9"
+                token: this.blockcypherToken || "6d9cba333f234b9498473955497c40d9"
             });
         } else {
             message = JSON.stringify({
@@ -92,7 +103,7 @@ class Provider {
 
         let subscription = {
             unsubscribe: () => {
-                if (!this.testnet) {
+                if (!this.testnet && !this.blockcypherToken) {
                     ws.send(JSON.stringify({
                         "op": "unconfirmed_unsub"
                     }));
@@ -121,7 +132,7 @@ class Provider {
             let result = true;
             let data = JSON.parse(res.data);
             
-            if (!this.testnet) {
+            if (!this.testnet && !this.blockcypherToken) {
                 result = data.x.out.find(o => {
                     return String(o.addr).toLowerCase() == receiver.toLowerCase();
                 });

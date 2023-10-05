@@ -16,6 +16,8 @@ module.exports = Object.assign(utils, {
         if (typeof error == 'object') {
             if (error.code == 4001 || error.message == 'User rejected the request.') {
                 return reject('request-rejected');
+            } else if (String(error).includes('is not valid JSON')) {
+                return reject('not-accepted-chain');
             }
         }
 

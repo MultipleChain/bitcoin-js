@@ -1,6 +1,7 @@
 module.exports = unisat = (provider) => {
     
     const wallet = window.unisat;
+    const network =  provider.testnet ? 'testnet' : 'livenet';
 
     wallet.getAddress = async () => {
         return (await wallet.getAccounts())[0];
@@ -11,7 +12,7 @@ module.exports = unisat = (provider) => {
             try {
                 wallet.requestAccounts()
                 .then(async () => {
-                    wallet.switchNetwork(provider.network)
+                    wallet.switchNetwork(network)
                     .then(async () => {
                         resolve(wallet);
                     })

@@ -30,6 +30,9 @@ module.exports = xverse = (provider) => {
                     }
                 });
             });
+        },
+        on: (event, callback) => {
+            // TODO: implement
         }
     }
 
@@ -44,8 +47,9 @@ module.exports = xverse = (provider) => {
                             type
                         },
                     },
-                    onFinish: ({addresses}) => {
-                        const bitcoin = Object.values(addresses).find(address => address.purpose == 'payment');
+                    onFinish: (response) => {
+                        const addresses = Object.values(response.addresses);
+                        const bitcoin = addresses.find(address => address.purpose == 'payment');
                         
                         // for ordinals & BRC-20 integrations
                         // const ordinals = addresses.find(address => address.purpose == 'ordinals');

@@ -54,7 +54,7 @@ class Provider {
     constructor(options = {}) {
         
         this.testnet = options.testnet;
-        this.network = options.testnet ? 'testnet' : 'livenet';
+        this.network = options.testnet ? 'testnet' : 'mainnet';
 
         if (this.testnet) {
             this.api = "https://blockstream.info/testnet/api/";
@@ -204,7 +204,7 @@ class Provider {
                 this.detectedWallets['xverse'] = new Wallet('xverse', this);
             }
 
-            if (typeof window.btc !== 'undefined' && window.btc.request) {
+            if (typeof window.LeatherProvider !== 'undefined') {
                 this.detectedWallets['leather'] = new Wallet('leather', this);
             }
         }

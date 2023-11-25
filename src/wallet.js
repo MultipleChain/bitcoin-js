@@ -78,7 +78,7 @@ class Wallet {
      * @returns {Boolean}
      */
     isDetected() {
-        return this.adapter.detected;
+        return this.adapter.isDetected();
     }
 
     /**

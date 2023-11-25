@@ -81,6 +81,6 @@ module.exports = xverse = (provider) => {
         ],
         connect,
         download: 'https://www.xverse.app/download',
-        detected: Boolean(typeof window.XverseProviders !== 'undefined' && XverseProviders.BitcoinProvider)
+        isDetected: () => Boolean(typeof window.XverseProviders !== 'undefined' && XverseProviders.BitcoinProvider)
     }
 }

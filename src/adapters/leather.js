@@ -70,6 +70,6 @@ module.exports = leather = (provider) => {
         supports: ['browser'],
         connect,
         download: 'https://leather.io/install-extension',
-        detected: Boolean(typeof window.LeatherProvider !== 'undefined')
+        isDetected: () => Boolean(typeof window.LeatherProvider !== 'undefined')
     }
 }

@@ -41,7 +41,7 @@ class Provider {
     /**
      * @var {Object}
      */
-    detectedWallets = [];
+    supportedWallets = {};
 
     /**
      * @var {Object}
@@ -77,7 +77,7 @@ class Provider {
             }
         }
 
-        this.detectWallets();
+        this.initSupportedWallets();
     }
 
     getWalletOpenLink(address, amount) {
@@ -175,20 +175,25 @@ class Provider {
     }
 
     /**
-     * @param {Array|null} filter 
-     * @returns {Array}
+     * @returns {void}
      */
-    getSupportedWallets(filter) {
-        
+    initSupportedWallets() {
         const Wallet = require('./wallet');
 
-        const wallets = {
+        this.supportedWallets = {
             unisat: new Wallet('unisat', this),
             xverse: new Wallet('xverse', this),
             leather: new Wallet('leather', this),
         };
         
-        return Object.fromEntries(Object.entries(wallets).filter(([key]) => {
+    }
+
+    /**
+     * @param {Array|null} filter 
+     * @returns {Array}
+     */
+    getSupportedWallets(filter) {
+        return Object.fromEntries(Object.entries(this.supportedWallets).filter(([key]) => {
             return !filter ? true : filter.includes(key);
         }));
     }
@@ -198,27 +203,10 @@ class Provider {
      * @returns {Array}
      */
     getDetectedWallets(filter) {
-        return Object.fromEntries(Object.entries(this.detectedWallets).filter(([key]) => {
-            return !filter ? true : filter.includes(key);
+        let detectedWallets = this.getSupportedWallets(filter);
+        return Object.fromEntries(Object.entries(detectedWallets).filter(([key, value]) => {
+            return value.isDetected() == undefined ? true : value.isDetected()
         }));
-    }
-
-    detectWallets() {
-        if (typeof window != 'undefined') {
-            const Wallet = require('./wallet');
-
-            if (typeof window.unisat !== 'undefined' && unisat.requestAccounts) {
-                this.detectedWallets['unisat'] = new Wallet('unisat', this);
-            }
-
-            if (typeof window.XverseProviders !== 'undefined' && XverseProviders.BitcoinProvider) {
-                this.detectedWallets['xverse'] = new Wallet('xverse', this);
-            }
-
-            if (typeof window.LeatherProvider !== 'undefined') {
-                this.detectedWallets['leather'] = new Wallet('leather', this);
-            }
-        }
     }
 
     Coin() {

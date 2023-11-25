@@ -35,6 +35,6 @@ module.exports = unisat = (provider) => {
         supports: ['browser'],
         connect,
         download: 'https://unisat.io/download',
-        detected: Boolean(typeof window.unisat !== 'undefined' && window.unisat.requestAccounts)
+        isDetected: () => Boolean(typeof window.unisat !== 'undefined' && window.unisat.requestAccounts)
     }
 }

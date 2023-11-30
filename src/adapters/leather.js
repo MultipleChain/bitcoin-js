@@ -1,4 +1,4 @@
-module.exports = leather = (provider) => {
+module.exports = (provider) => {
 
     if (window.crypto && !window.crypto.randomUUID) {
         window.crypto.randomUUID = () => {

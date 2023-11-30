@@ -1,4 +1,4 @@
-module.exports = unisat = (provider) => {
+module.exports = (provider) => {
     
     const wallet = window.unisat;
     const network =  provider.testnet ? 'testnet' : 'livenet';

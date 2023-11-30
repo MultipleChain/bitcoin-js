@@ -159,8 +159,9 @@ class Provider {
      */
     connectWallet(adapter) {
         return new Promise(async (resolve, reject) => {
-            if (this.detectedWallets[adapter]) {
-                let wallet = this.detectedWallets[adapter];
+            let detectedWallets = this.getDetectedWallets();
+            if (detectedWallets[adapter]) {
+                let wallet = detectedWallets[adapter];
                 wallet.connect()
                 .then(() => {
                     resolve(wallet);
@@ -184,6 +185,7 @@ class Provider {
             unisat: new Wallet('unisat', this),
             xverse: new Wallet('xverse', this),
             leather: new Wallet('leather', this),
+            trustwallet: new Wallet('trustwallet', this),
         };
         
     }

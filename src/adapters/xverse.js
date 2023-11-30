@@ -1,6 +1,6 @@
 const {getAddress, sendBtcTransaction, BitcoinNetworkType} = require('sats-connect');
 
-module.exports = xverse = (provider) => {
+module.exports = (provider) => {
     
     const type = provider.testnet ? 
                     BitcoinNetworkType.Testnet: 

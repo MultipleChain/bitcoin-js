@@ -41,7 +41,7 @@ class Provider {
     /**
      * @var {Object}
      */
-    supportedWallets = {};
+    supportedWallets;
 
     /**
      * @var {Object}
@@ -76,8 +76,6 @@ class Provider {
                 this.wsUrl = "wss://ws.blockchain.info/inv";
             }
         }
-
-        this.initSupportedWallets();
     }
 
     getWalletOpenLink(address, amount) {
@@ -176,25 +174,21 @@ class Provider {
     }
 
     /**
-     * @returns {void}
-     */
-    initSupportedWallets() {
-        const Wallet = require('./wallet');
-
-        this.supportedWallets = {
-            unisat: new Wallet('unisat', this),
-            xverse: new Wallet('xverse', this),
-            leather: new Wallet('leather', this),
-            trustwallet: new Wallet('trustwallet', this),
-        };
-        
-    }
-
-    /**
      * @param {Array|null} filter 
      * @returns {Array}
      */
     getSupportedWallets(filter) {
+        if (!this.supportedWallets) {
+            const Wallet = require('./wallet');
+
+            this.supportedWallets = {
+                unisat: new Wallet('unisat', this),
+                xverse: new Wallet('xverse', this),
+                leather: new Wallet('leather', this),
+                trustwallet: new Wallet('trustwallet', this),
+            }
+        }
+
         return Object.fromEntries(Object.entries(this.supportedWallets).filter(([key]) => {
             return !filter ? true : filter.includes(key);
         }));

@@ -3,8 +3,10 @@ module.exports = (provider) => {
     const wallet = window.unisat;
     const network =  provider.testnet ? 'testnet' : 'livenet';
 
-    wallet.getAddress = async () => {
-        return (await wallet.getAccounts())[0];
+    if (wallet) {
+        wallet.getAddress = async () => {
+            return (await wallet.getAccounts())[0];
+        }
     }
 
     const connect = async () => {

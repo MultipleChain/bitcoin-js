@@ -114,42 +114,33 @@ class Transaction {
     /**
      * @returns {Boolean}
      */
-    validateTransaction() {
-        return new Promise((resolve, reject) => {
-            this.intervalValidate = setInterval(async () => {
-                try {
+    async validate(timer = 1) {
+        timer = this.timer || timer;
+        try {
+            
+            await this.getData();
 
-                    await this.getData();
+            let result = null;
 
-                    let result = null;
+            if (this.data && this.data.status.block_height) {
+                result = true;
+            }
 
-                    if (this.data == null) {
-                        result = false;
-                    } else {
-                        if (this.data.status.block_height) {
-                            result = true;
-                        }
-                    }
+            if (typeof result == 'boolean') {
+                return result;
+            }
 
-                    if (typeof result == 'boolean') {
-                        clearInterval(this.intervalValidate);
-                        if (result == true) {
-                            resolve(true);
-                        } else {
-                            reject(false);
-                        }
-                    }
-    
-                } catch (error) {
-                    if (error.message == 'There was a problem retrieving transaction data!') {
-                        this.validateTransaction();
-                    } else {
-                        clearInterval(this.intervalValidate);
-                        reject(error);
-                    }
-                }
-            }, (this.timer*1000));
-        });
+            await new Promise(r => setTimeout(r, (timer*1000)));
+
+            return this.validate(timer);
+        } catch (error) {
+            
+            if (error.message == 'There was a problem retrieving transaction data!') {
+                return this.validate(timer);
+            } else {
+                throw error;
+            }
+        }
     }
 
     /**
@@ -158,7 +149,7 @@ class Transaction {
      */
     async verifyTransferWithData(config) {
 
-        if (await this.validateTransaction()) {
+        if (await this.validate()) {
 
             let index = this.data.vout.findIndex(object => {
                 return object.scriptpubkey_address == config.receiver;

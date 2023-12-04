@@ -118,6 +118,8 @@ class Transaction {
         timer = this.timer || timer;
         try {
             
+            await new Promise(r => setTimeout(r, (timer*1000)));
+
             await this.getData();
 
             let result = null;
@@ -129,8 +131,6 @@ class Transaction {
             if (typeof result == 'boolean') {
                 return result;
             }
-
-            await new Promise(r => setTimeout(r, (timer*1000)));
 
             return this.validate(timer);
         } catch (error) {

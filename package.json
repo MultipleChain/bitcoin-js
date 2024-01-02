@@ -4,7 +4,7 @@
   "version": "0.1.18",
   "description": "Bitcoin JS provider",
   "scripts": {
-    "serve": "parcel test.html --no-cache --dist-dir test",
+    "serve": "parcel test.html --port 4032 --no-cache --dist-dir test",
     "build": "webpack"
   },
   "files": [
